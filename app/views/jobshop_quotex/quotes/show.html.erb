@@ -1,0 +1,109 @@
+<div id="main_body">
+<h4><%=t('Quote Info') %></h4>
+
+<p>
+  <b><%= t('Quote Task') %></b>
+  <%= JobshopQuotex.quote_task_class.find_by_id(@quote.quote_task_id).name %>
+</p>
+<p>
+  <b><%= t('Quote Date') %></b>
+  <%= @quote.created_at.strftime("%Y/%m/%d") %>
+</p>
+<p>
+  <b><%= t('Qty Quoted') %></b>
+  <%= @quote.qty_quoted %><%= @quote.unit%>
+</p>
+<p>
+  <b><%= t('Unit Price') %></b>
+  <%= @quote.unit_price %>
+</p>
+<p>
+  <b><%= t('Material Quoted') %></b>
+  <%= @quote.material_quoted %>
+</p>
+<p>
+  <b><%= t('Material WT(g)')  %></b>
+  <%= @quote.material_wt %>
+</p>
+<p>
+  <b><%= t('Material Unit Price($/kg)') %></b>
+  <%= @quote.material_unit_price %>
+</p>
+<p>
+  <b><%= t('Material Cost') %></b>
+  <%= @quote.material_cost %>
+</p>
+<p>
+  <b><%= t('Machining Cost') %></b>
+  <%= @quote.machining_cost %>
+</p>
+<p>
+  <b><%= t('Grinding Cost') %></b>
+  <%= @quote.grinding_cost %>
+</p>
+<p>
+  <b><%= t('Surface Finish Cost') %></b>
+  <%= @quote.surface_finish_cost %>
+</p>
+<p>
+  <b><%= t('Plating Cost') %></b>
+  <%= @quote.plating_cost %>
+</p>
+<p>
+  <b><%= t('Heat Treat Cost') %></b>
+  <%= @quote.heat_treat_cost %>
+</p>
+<p>
+  <b><%= t('Insp Cost') %></b>
+  <%= @quote.insp_cost %>
+</p>
+<p>
+  <b><%= t('Mgmt Cost') %></b>
+  <%= @quote.mgmt_cost %>
+</p>
+<p>
+  <b><%= t('Packing Cost') %></b>
+  <%= @quote.packing_cost %>
+</p>
+<p>
+  <b><%= t('Shipping Cost') %></b>
+  <%= @quote.shipping_cost %>
+</p>
+<p>
+  <b><%= t('Tax') %></b>
+  <%= @quote.tax %>
+</p>
+<p>
+  <b><%= t('Tooling Cost') %></b>
+  <%= @quote.tooling_cost %>
+</p>
+<p>
+  <b><%= t('Void') %></b>
+  <%= @quote.void ? t('Yes') : t('No') %>
+</p>
+<p>
+  <b><%= t('Quoted By') %></b>
+  <%= @quote.quoted_by.name %>
+</p>
+
+<p>
+  <b><%= t('Last Updated By') %></b>
+  <%= @quote.last_updated_by.name %>
+</p>
+<p>
+  <b><%= t('Note') %></b>
+  <%= @quote.note %>
+</p>
+<% if false %>
+<p>
+  <b>LOG：</b>
+  <% Commonx::Log.where('resource_id = ? AND resource_name = ?', @quote.id, params[:controller].sub('/', '_')).order("created_at DESC").each do |t| %>
+    <li><%= t.created_at.strftime("%Y/%m/%d") %>,&nbsp; <%= t.last_updated_by.name %>,&nbsp; <%= t.log %> </li>
+  <% end %>
+</p>
+<% end %>
+  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :id => 'close', :class => BUTTONS_CLS['action'] %>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<%#= link_to t('New Log'), SUBURI + commonx.new_log_path(:resource_id => @quote.id, :resource_name => params[:controller], :subaction => 'jobshop_quote', :format => :js), :remote => true, 
+                        <%#=  :id => 'new_log_link', :class => BUTTONS_CLS['action'] if has_action_right?('create_jobshop_quote', 'commonx/logs') %>    	
+</div>

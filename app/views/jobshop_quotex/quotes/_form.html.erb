@@ -1,0 +1,34 @@
+<%= simple_form_for @quote do |f| %> 
+      <%#= f.input :quote_task_noupdate, :label => t('Quote Task'), :input_html => {:value => @quote.quote_task.name}, :readonly => true %>   
+      <%= link_to JobshopQuotex.quote_task_class.find_by_id(@quote_task.id).name, SUBURI + "/authentify/view_handler?index=1&url=#{event_taskx.event_task_path(@quote_task)}"  %>
+      <%= f.input :material_quoted, :label => t('Material Quoted') %>   
+	  <%= f.input :qty_quoted, :label => t('Qty Quoted') %> 
+	  <%= f.input :unit, :label => t('Qty Unit'), :collection => @qty_unit %>
+	  <%= f.input :material_wt, :label => t('Material WT(g)'), :palceholder => 'x.xx' %> 
+	  <%= f.input :material_unit_price, :label => t('Material Unit Price($/KG)'), :palceholder => 'x.xx' %> 
+	  <%= f.input :material_cost, :label => t('Material Cost'), :readonly => true %>
+	  <%= f.input :unit_price, :label => t('Unit Price'), :readonly => true %>
+	  <%= f.input :machining_cost, :label => t('Machining Cost'), :palceholder => 'x.xxxx or nothing' %> 
+	  <%= f.input :grinding_cost, :label => t('Grinding Cost'), :palceholder => 'x.xxxx or nothing' %> 
+	  <%= f.input :plating_cost, :label => t('Plating Cost'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :surface_finish_cost, :label => t('Surface Finish Cost'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :heat_treat_cost, :label => t('Heat Treat Cost'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :insp_cost, :label => t('Insp Cost'), :palceholder => 'x.xxxx or nothing' %> 
+	  <%= f.input :packing_cost, :label => t('Packing Cost'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :shipping_cost, :label => t('Shipping Cost'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :mgmt_cost, :label => t('Mgmt Cost'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :misc_cost, :label => t('Misc Cost'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :tax, :label => t('Tax'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :profit, :label => t('Profit'), :palceholder => 'x.xxxx or nothing' %>
+	  <%= f.input :tooling_cost, :label => t('Tooling Cost'), :palceholder => 'x or nothing' %>
+	  <% if readonly?(@quote, 'void')%>
+        <%= f.input :void_noupdate, :label => t('Void'), :readonly => true, :required => false, :input_html => {:value => @quote.void} %>
+      <% else %>
+        <%= f.input :void, :label => t('Void'), :collection => [[t('Yes'), true], [t('No'), false]]%>
+      <% end %>
+	  <%= f.input :quoted_by_noupdate, :label => t('Quoted_by'), :readonly => true, :required => false, :input_html => {:value => @quote.quoted_by.name} %>
+	  <%= f.input :note, :label => t('Note'), :input_html => {:rows => 4} %>
+	  
+	  <%= f.button :submit, t('Save'), :class =>'btn btn-primary' %>  
+<% end %>  
+
