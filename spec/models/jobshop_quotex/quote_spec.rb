@@ -17,6 +17,11 @@ module JobshopQuotex
       c.should_not be_valid
     end
     
+    it "should reject 0 rfq_id" do
+      c = FactoryGirl.build(:jobshop_quotex_quote, :rfq_id => 0)
+      c.should_not be_valid
+    end
+    
     it "should reject 0 quote_task_id" do
       c = FactoryGirl.build(:jobshop_quotex_quote, :quote_task_id => 0)
       c.should_not be_valid

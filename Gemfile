@@ -14,6 +14,7 @@ gem 'commonx', :path => '../commonx'
 gem 'event_taskx', :path => '../event_taskx'
 gem 'mfg_processx', :path => '../mfg_processx'
 gem 'jobshop_rfqx', :path => '../jobshop_rfqx'
+gem 'kustomerx', :path => '../kustomerx'
 
 # Declare any dependencies that are still in development here instead of in
 # your gemspec. These might include edge Rails or gems from your path or

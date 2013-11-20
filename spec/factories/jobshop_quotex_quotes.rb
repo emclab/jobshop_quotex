@@ -2,6 +2,7 @@
 
 FactoryGirl.define do
   factory :jobshop_quotex_quote, :class => 'JobshopQuotex::Quote' do
+    rfq_id 1
     quote_task_id 1
     wfid "MyString"
     last_updated_by_id 1

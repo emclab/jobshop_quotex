@@ -1,7 +1,12 @@
+<% if false %>
+  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  
+<% else %>
 <div class="pagination"><%= will_paginate models %></div>
     <table class="table table-striped">
 		<tr>
-			<th><%= t('RFQ') %></th>
+			<th><%= t('Q#')%></th>
+			<th><%= t('Product/Drawing') %></th>
 			<th><%= t('Quote Task') %></th>
 			<th><%= t('Quote Date') %></th>
 			<th><%= t('Qty') %></th>
@@ -18,6 +23,12 @@
 		</tr>
 		<% models.each do |r| %>
 		  <tr>
+		  	<% if has_action_right?('show', params[:controller], r) %>
+		  	  <td><%=link_to r.id.to_s, SUBURI + "/authentify/view_handler?index=1&url=#{quote_path(r)}", :class => BUTTONS_CLS['action']  %></td>
+		  	<% else %>
+		  	  <td><%= r.id %></td>
+		  	<% end %>
+		  	<td><%= JobshopQuotex.rfq_class.find_by_id(r.rfq_id).product_name + ' ' + JobshopQuotex.rfq_class.find_by_id(r.rfq_id).drawing_num %></td>
 		  	<td><%= JobshopQuotex.quote_task_class.find_by_id(r.quote_task_id).name %></td>
 		  	<td><%= r.created_at.strftime("%Y/%m/%d") %></td>
 		  	<td><%= prt(r, :qty_quoted) %><%= prt(r, :unit) %></td>
@@ -40,9 +51,10 @@
 	    <th>
 	    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	    	<%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action']  %>
-	    	<%= link_to t('New Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{new_quote_path(:quote_task_id => @quote_task.id, :parent_record_id => @quote_task.id, :parent_resource => JobshopQuotex.quote_task_class.underscore.pluralize)}", :class => BUTTONS_CLS['action']  if @quote_task && has_action_right?('create', params[:controller], @quote_task) %>
-	    	<%= link_to t('Copy Last Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{copy_last_quotes_path(:quote_task_id => @quote_task.id, :parent_record_id => @quote_task.id, :parent_resource => JobshopQuotex.quote_task_class.underscore.pluralize)}", :class => BUTTONS_CLS['action']  if models.present? && @quote_task && has_action_right?('create', params[:controller], @quote_task) %>
+	    	<%= link_to t('New Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{new_quote_path(:quote_task_id => @quote_task.id, :parent_record_id => @quote_task.id, :parent_resource => JobshopQuotex.quote_task_class.to_s.underscore.pluralize)}", :class => BUTTONS_CLS['action']  if @quote_task && has_action_right?('create', params[:controller], @quote_task) %>
+	    	<%= link_to t('Copy Last Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{copy_last_quotes_path(:quote_task_id => @quote_task.id, :parent_record_id => @quote_task.id, :parent_resource => JobshopQuotex.quote_task_class.to_s.underscore.pluralize)}", :class => BUTTONS_CLS['action']  if models.present? && @quote_task && has_action_right?('create', params[:controller], @quote_task) %>
 	    </th>
 	  </tr>
 	</table>
-	
+
+<% end %>	

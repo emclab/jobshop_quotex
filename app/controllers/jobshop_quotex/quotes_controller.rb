@@ -3,11 +3,12 @@ require_dependency "jobshop_quotex/application_controller"
 module JobshopQuotex
   class QuotesController < ApplicationController
     before_filter :require_employee
-    before_filter :load_quote_task
+    before_filter :load_parent_record
     
     def index
       @title = t('Quotes')
       @quotes = params[:jobshop_quotex_quotes][:model_ar_r]  #returned by check_access_right
+      @quotes = @quotes.where(:rfq_id => @rfq.id) if @rfq
       @quotes = @quotes.where(:quote_task_id => @quote_task.id) if @quote_task
       @quotes = @quotes.page(params[:page]).per_page(@max_pagination) 
       @erb_code = find_config_const('quote_index_view', 'jobshop_quotex_quotes')
@@ -64,10 +65,12 @@ module JobshopQuotex
     end
     
     protected
-    def load_quote_task
-      #@quote_task = params[:parent_resource].camelize.singularize.constantize.find_by_id(params[:parent_record_id]) if params[:parent_resource].present? && params[:parent_record_id].present?
+    def load_parent_record
+      @rfq = JobshopQuotex.rfq_class.find_by_id(params[:rfq_id]) if params[:rfq_id].present?
+      @rfq = JobshopQuotex.rfq_class.find_by_id(JobshopQuotex::quote_task_class.find_by_id(params[:quote_task_id]).resource_id) if params[:quote_task_id].present?
       @quote_task = JobshopQuotex.quote_task_class.find_by_id(params[:quote_task_id]) if params[:quote_task_id].present?
-      @quote_task = JobshopQuotex.quote_task_class.find_by_id(params[:id]) if params[:id].present?
+      @quote_task = JobshopQuotex.quote_task_class.find_by_id(JobshopQuotex::Quote.find_by_id(params[:id]).quote_task_id) if params[:id].present?
+      @rfq = JobshopQuotex.rfq_class.find_by_id(JobshopQuotex::Quote.find_by_id(params[:id]).rfq_id) if params[:id].present?
     end
   end
 end

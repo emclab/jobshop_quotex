@@ -38,14 +38,18 @@ describe "LinkTests" do
       ua1 = FactoryGirl.create(:user_access, :action => 'update', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
            :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'show', :resource =>'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
-        :sql_code => "record.requested_by_id == session[:user_id]")
-      user_access = FactoryGirl.create(:user_access, :action => 'create_quote', :resource => 'commonx_logs', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "record.quoted_by_id == session[:user_id]")
+      user_access = FactoryGirl.create(:user_access, :action => 'create_in_quote', :resource => 'commonx_logs', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
       
-      @cust = FactoryGirl.create(:customer)  
-      @q_task = FactoryGirl.create(:event_taskx_event_task) 
-      @q_task1 = FactoryGirl.create(:event_taskx_event_task, :name => 'quote && quote')  
-            
+      @cust = FactoryGirl.create(:kustomerx_customer) 
+      rfq = FactoryGirl.create(:jobshop_rfqx_rfq, :customer_id => @cust.id) 
+      @q_task = FactoryGirl.create(:event_taskx_event_task, :resource_id => rfq.id, :resource_string => JobshopQuotex.rfq_class.to_s.underscore.pluralize)
+      #@q_task1 = FactoryGirl.create(:event_taskx_event_task, :name => 'quote && quote')
+      mfg_process = FactoryGirl.create(:mfg_processx_mfg_process) 
+      @quote = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :mfg_process_id => mfg_process.id, :rfq_id => rfq.id) 
+      log = FactoryGirl.create(:commonx_log, :resource_id => @quote.id, :resource_name => 'jobshop_quotex_quotes')
+          
       visit '/'
       #save_and_open_page
       fill_in "login", :with => @u.login
@@ -55,8 +59,18 @@ describe "LinkTests" do
     
     it "works! (now write some real specs)" do
       # Run the generator again with the --webrat flag if you want to use webrat methods/matchers
+      
       visit quotes_path
-      response.status.should be(200)
+      save_and_open_page
+      page.should have_content('Quotes')
+      click_link 'Edit'
+      page.should have_content('Update Quote')
+      visit quotes_path
+      click_link @quote.id.to_s
+      #save_and_open_page
+      page.should have_content('Quote Info')
+      click_link 'New Log'
+      page.should have_content('Log')
     end
   end
 end

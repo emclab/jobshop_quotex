@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   mount EventTaskx::Engine => '/event_taskx'
   mount MfgProcessx::Engine => '/mfg_processx'
   mount JobshopRfqx::Engine => '/jobshop_rfqx'
+  mount Kustomerx::Engine => '/kustomerx'
   
   resource :session
   

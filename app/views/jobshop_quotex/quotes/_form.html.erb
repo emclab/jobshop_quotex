@@ -1,3 +1,7 @@
+<% if false %>
+  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  
+<% else %>
 <%= simple_form_for @quote do |f| %> 
       <%#= f.input :quote_task_noupdate, :label => t('Quote Task'), :input_html => {:value => @quote.quote_task.name}, :readonly => true %>   
       <%= link_to JobshopQuotex.quote_task_class.find_by_id(@quote_task.id).name, SUBURI + "/authentify/view_handler?index=1&url=#{event_taskx.event_task_path(@quote_task)}"  %>
@@ -29,6 +33,9 @@
 	  <%= f.input :quoted_by_noupdate, :label => t('Quoted_by'), :readonly => true, :required => false, :input_html => {:value => @quote.quoted_by.name} %>
 	  <%= f.input :note, :label => t('Note'), :input_html => {:rows => 4} %>
 	  
+	  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
 	  <%= f.button :submit, t('Save'), :class =>'btn btn-primary' %>  
-<% end %>  
+<% end %> 
+
+<% end %> 
 

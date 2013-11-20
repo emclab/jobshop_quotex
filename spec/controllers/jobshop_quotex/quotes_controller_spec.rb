@@ -18,8 +18,11 @@ module JobshopQuotex
       ul = FactoryGirl.build(:user_level, :sys_user_group_id => ug.id)
       @u = FactoryGirl.create(:user, :user_levels => [ul], :user_roles => [ur])
       
-      @q_task = FactoryGirl.create(:event_taskx_event_task) 
-      @q_task1 = FactoryGirl.create(:event_taskx_event_task, :name => 'quote && quote') 
+      @cust = FactoryGirl.create(:kustomerx_customer) 
+      @rfq = FactoryGirl.create(:jobshop_rfqx_rfq, :customer_id => @cust.id) 
+      @q_task = FactoryGirl.create(:event_taskx_event_task, :resource_id => @rfq.id, :resource_string => JobshopQuotex.rfq_class.to_s.underscore.pluralize)
+      @q_task1 = FactoryGirl.create(:event_taskx_event_task, :name => 'a new name', :resource_id => @rfq.id, :resource_string => JobshopQuotex.rfq_class.to_s.underscore.pluralize)
+      @mfg_process = FactoryGirl.create(:mfg_processx_mfg_process)
     end
     
     render_views
@@ -30,8 +33,8 @@ module JobshopQuotex
         :sql_code => "JobshopQuotex::Quote.where(:void => false).order('created_at DESC')")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id)
-        q1 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id)
+        q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :mfg_process_id => @mfg_process.id, :rfq_id => @rfq.id)
+        q1 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :mfg_process_id => @mfg_process.id, :rfq_id => @rfq.id)
         get 'index', {:use_route => :jobshop_quotex}
         assigns(:quotes).should =~ [q, q1]
       end
@@ -41,8 +44,8 @@ module JobshopQuotex
         :sql_code => "JobshopQuotex::Quote.where(:void => false).order('created_at DESC')")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id)
-        q1 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id)
+        q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :mfg_process_id => @mfg_process.id, :rfq_id => @rfq.id)
+        q1 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :mfg_process_id => @mfg_process.id, :rfq_id => @rfq.id)
         get 'index', {:use_route => :jobshop_quotex, :quote_task_id => @q_task1.id}
         assigns(:quotes).should =~ [q1]
       end
