@@ -6,7 +6,7 @@
       <%= link_to JobshopQuotex.quote_task_class.find_by_id(@quote_task.id).name, SUBURI + "/authentify/view_handler?index=1&url=#{event_taskx.event_task_path(@quote_task)}"  %>
       <%= f.input :material_quoted, :label => t('Material Quoted') %>   
 	  <%= f.input :qty_quoted, :label => t('Qty Quoted') %> 
-	  <%= f.input :unit, :label => t('Qty Unit'), :collection => @qty_unit %>
+	  <%= f.input :unit, :label => t('Qty Unit'), :collection => @qty_unit, :include_blank => true %>
 	  <%= f.input :material_wt, :label => t('Material WT(g)'), :palceholder => 'x.xx' %> 
 	  <%= f.input :material_unit_price, :label => t('Material Unit Price($/KG)'), :palceholder => 'x.xx' %> 
 	  <%= f.input :material_cost, :label => t('Material Cost'), :readonly => true %>
