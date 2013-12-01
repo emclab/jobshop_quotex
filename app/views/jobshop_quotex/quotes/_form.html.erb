@@ -3,35 +3,36 @@
   
 <% else %>
 <%= simple_form_for @quote do |f| %> 
-      <%#= f.input :quote_task_noupdate, :label => t('Quote Task'), :input_html => {:value => @quote.quote_task.name}, :readonly => true %>   
+         
       <%= link_to JobshopQuotex.quote_task_class.find_by_id(@quote_task.id).name, SUBURI + "/authentify/view_handler?index=1&url=#{event_taskx.event_task_path(@quote_task)}"  %>
-      <%= f.input :material_quoted, :label => t('Material Quoted') %>   
-	  <%= f.input :qty_quoted, :label => t('Qty Quoted') %> 
-	  <%= f.input :unit, :label => t('Qty Unit'), :collection => @qty_unit %>
-	  <%= f.input :material_wt, :label => t('Material WT(g)'), :palceholder => 'x.xx' %> 
-	  <%= f.input :material_unit_price, :label => t('Material Unit Price($/KG)'), :palceholder => 'x.xx' %> 
+      <%= f.input :material_quoted, :label => t('Material Quoted'), :readonly => readonly?(@quote, 'material_quoted') %>   
+	  <%= f.input :qty_quoted, :label => t('Qty Quoted'), :readonly => readonly?(@quote, 'qty_quoted') %> 
+	  <%= f.input :unit, :label => t('Qty Unit'), :collection => @qty_unit unless readonly?(@quote, 'unit') %>
+	  <%= f.input :unit, :label => t('Qty Unit'), :readonly => true, :input_html => {:value => @quote.unit} if readonly?(@quote, 'unit') %>
+	  <%= f.input :material_wt, :label => t('Material WT(g)'), :palceholder => 'x.xx', :readonly => readonly?(@quote, 'material_wt') %> 
+	  <%= f.input :material_unit_price, :label => t('Material Unit Price($/KG)'), :palceholder => 'x.xx', :readonly => readonly?(@quote, 'material_unit_price') %> 
 	  <%= f.input :material_cost, :label => t('Material Cost'), :readonly => true %>
 	  <%= f.input :unit_price, :label => t('Unit Price'), :readonly => true %>
-	  <%= f.input :machining_cost, :label => t('Machining Cost'), :palceholder => 'x.xxxx or nothing' %> 
-	  <%= f.input :grinding_cost, :label => t('Grinding Cost'), :palceholder => 'x.xxxx or nothing' %> 
-	  <%= f.input :plating_cost, :label => t('Plating Cost'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :surface_finish_cost, :label => t('Surface Finish Cost'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :heat_treat_cost, :label => t('Heat Treat Cost'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :insp_cost, :label => t('Insp Cost'), :palceholder => 'x.xxxx or nothing' %> 
-	  <%= f.input :packing_cost, :label => t('Packing Cost'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :shipping_cost, :label => t('Shipping Cost'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :mgmt_cost, :label => t('Mgmt Cost'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :misc_cost, :label => t('Misc Cost'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :tax, :label => t('Tax'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :profit, :label => t('Profit'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :tooling_cost, :label => t('Tooling Cost'), :palceholder => 'x or nothing' %>
+	  <%= f.input :machining_cost, :label => t('Machining Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'machining_cost') %> 
+	  <%= f.input :grinding_cost, :label => t('Grinding Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'grinding_cost') %> 
+	  <%= f.input :plating_cost, :label => t('Plating Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'plating_cost') %>
+	  <%= f.input :surface_finish_cost, :label => t('Surface Finish Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'surface_finish_cost') %>
+	  <%= f.input :heat_treat_cost, :label => t('Heat Treat Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'heat_treat_cost') %>
+	  <%= f.input :insp_cost, :label => t('Insp Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'insp_cost') %> 
+	  <%= f.input :packing_cost, :label => t('Packing Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'packing_cost') %>
+	  <%= f.input :shipping_cost, :label => t('Shipping Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'shipping_cost') %>
+	  <%= f.input :mgmt_cost, :label => t('Mgmt Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'mgmt_cost') %>
+	  <%= f.input :misc_cost, :label => t('Misc Cost'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'misc_cost') %>
+	  <%= f.input :tax, :label => t('Tax'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'tax') %>
+	  <%= f.input :profit, :label => t('Profit'), :palceholder => 'x.xxxx or nothing', :readonly => readonly?(@quote, 'profit') %>
+	  <%= f.input :tooling_cost, :label => t('Tooling Cost'), :palceholder => 'x or nothing', :readonly => readonly?(@quote, 'tooling_cost') %>
 	  <% if readonly?(@quote, 'void')%>
         <%= f.input :void_noupdate, :label => t('Void'), :readonly => true, :required => false, :input_html => {:value => @quote.void} %>
       <% else %>
         <%= f.input :void, :label => t('Void'), :collection => [[t('Yes'), true], [t('No'), false]]%>
       <% end %>
 	  <%= f.input :quoted_by_noupdate, :label => t('Quoted_by'), :readonly => true, :required => false, :input_html => {:value => @quote.quoted_by.name} %>
-	  <%= f.input :note, :label => t('Note'), :input_html => {:rows => 4} %>
+	  <%= f.input :note, :label => t('Note'), :input_html => {:rows => 4}, :readonly => readonly?(@quote, 'note') %>
 	  
 	  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
 	  <%= f.button :submit, t('Save'), :class =>'btn btn-primary' %>  

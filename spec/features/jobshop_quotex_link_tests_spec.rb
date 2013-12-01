@@ -39,7 +39,7 @@ describe "LinkTests" do
            :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'show', :resource =>'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "record.quoted_by_id == session[:user_id]")
-      user_access = FactoryGirl.create(:user_access, :action => 'create_in_quote', :resource => 'commonx_logs', :role_definition_id => @role.id, :rank => 1,
+      user_access = FactoryGirl.create(:user_access, :action => 'create_jobshop_quote', :resource => 'commonx_logs', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
       
       @cust = FactoryGirl.create(:kustomerx_customer) 
@@ -61,7 +61,7 @@ describe "LinkTests" do
       # Run the generator again with the --webrat flag if you want to use webrat methods/matchers
       
       visit quotes_path
-      save_and_open_page
+      #save_and_open_page
       page.should have_content('Quotes')
       click_link 'Edit'
       page.should have_content('Update Quote')
@@ -69,6 +69,7 @@ describe "LinkTests" do
       click_link @quote.id.to_s
       #save_and_open_page
       page.should have_content('Quote Info')
+      save_and_open_page
       click_link 'New Log'
       page.should have_content('Log')
     end
