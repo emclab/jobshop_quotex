@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   mount MfgProcessx::Engine => '/mfg_processx'
   mount JobshopRfqx::Engine => '/jobshop_rfqx'
   mount Kustomerx::Engine => '/kustomerx'
+  mount Searchx::Engine => '/searchx'
   
   resource :session
   
