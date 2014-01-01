@@ -29,6 +29,9 @@ module JobshopQuotex
       if @quote.save
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
       else
+        @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
+        @rfq = JobshopQuotex.rfq_class.find_by_id(params[:quote][:rfq_id]) if params[:quote].present? && params[:quote][:rfq_id].present?
+        @quote_task = JobshopQuotex.quote_task_class.find_by_id(params[:quote][:quote_task_id]) if params[:quote].present? && params[:quote][:quote_task_id].present?
         flash[:notice] = t('Data Error. Not Saved!')
         render 'new'
       end
