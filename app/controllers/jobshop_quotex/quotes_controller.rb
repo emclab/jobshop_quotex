@@ -41,6 +41,9 @@ module JobshopQuotex
       @title = t('Update Quote')
       @quote = JobshopQuotex::Quote.find_by_id(params[:id])
       @erb_code = find_config_const('quote_edit_view', 'jobshop_quotex_quotes')
+      if @quote.wf_state.present? && @quote.current_state != :initial_state
+        redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
+      end
     end
   
     def update
@@ -58,6 +61,11 @@ module JobshopQuotex
       @title = t('Quote Info')
       @quote = JobshopQuotex::Quote.find_by_id(params[:id])
       @erb_code = find_config_const('quote_show_view', 'jobshop_quotex_quotes')
+    end
+    
+    def list_open_process  
+      index()
+      @quotes = return_open_process(@quotes, find_config_const('quote_wf_final_state_string', 'jobshop_quotex'))  # ModelName_wf_final_state_string
     end
   
     def copy_last

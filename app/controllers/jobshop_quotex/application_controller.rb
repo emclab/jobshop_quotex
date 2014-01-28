@@ -5,6 +5,8 @@ module JobshopQuotex
     include Authentify::UsersHelper
     include Authentify::UserPrivilegeHelper
     include Commonx::CommonxHelper
+    include Searchx::SearchHelper
+    include BizWorkflowx::WfHelper
     
     before_filter :require_signin
     before_filter :max_pagination

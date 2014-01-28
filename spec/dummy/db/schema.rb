@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131018202321) do
+ActiveRecord::Schema.define(:version => 20140128202522) do
 
   create_table "authentify_engine_configs", :force => true do |t|
     t.string   "engine_name"
@@ -256,6 +256,7 @@ ActiveRecord::Schema.define(:version => 20131018202321) do
     t.integer  "quote_task_id"
     t.integer  "mfg_process_id"
     t.string   "wfid"
+    t.string   "wf_state"
     t.integer  "last_updated_by_id"
     t.integer  "qty_quoted"
     t.string   "unit"
@@ -397,5 +398,23 @@ ActiveRecord::Schema.define(:version => 20131018202321) do
     t.datetime "created_at",                                             :null => false
     t.datetime "updated_at",                                             :null => false
   end
+
+  create_table "state_machine_logx_logs", :force => true do |t|
+    t.string   "resource_string"
+    t.integer  "resource_id"
+    t.string   "event"
+    t.string   "action_by_name"
+    t.text     "comment"
+    t.string   "from"
+    t.string   "to"
+    t.text     "error_message"
+    t.integer  "last_updated_by_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  add_index "state_machine_logx_logs", ["resource_id"], :name => "index_state_machine_logx_logs_on_resource_id"
+  add_index "state_machine_logx_logs", ["resource_string", "resource_id"], :name => "index_state_machine_logx_logs_on_resource_string_and_resource_id"
+  add_index "state_machine_logx_logs", ["resource_string"], :name => "index_state_machine_logx_logs_on_resource_string"
 
 end

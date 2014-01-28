@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   mount JobshopRfqx::Engine => '/jobshop_rfqx'
   mount Kustomerx::Engine => '/kustomerx'
   mount Searchx::Engine => '/searchx'
+  mount StateMachineLogx::Engine => '/sm_log'
+  mount BizWorkflowx::Engine => '/wf'
   
   resource :session
   

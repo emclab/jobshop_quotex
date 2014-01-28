@@ -1,17 +1,40 @@
 module JobshopQuotex
+  include Authentify::AuthentifyUtility
+  require 'workflow'
   class Quote < ActiveRecord::Base
+    include Workflow
+    workflow_column :wf_state
     
-    attr_accessor :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate
+    workflow do
+      #self.to_s = 'EngineName::TableName'    ex, 'InQuotex::Quote'
+      wf = Authentify::AuthentifyUtility.find_config_const('quote_wf_pdef', 'jobshop_quotex')
+      if Authentify::AuthentifyUtility.find_config_const('wf_pdef_in_config') == 'true' && wf.present?
+         #quotes is table name
+        eval(wf) if wf.present? && self.wf_state.present 
+      elsif Rails.env.test? #for rspec. loaded before FactoryGirl.
+        state :initial_state do
+          event :submit, :transitions_to => :reviewing
+        end
+        state :reviewing do
+          event :approve, :transitions_to => :approved
+          event :reject, :transitions_to => :rejected
+        end
+        state :approved
+        state :rejected
+      end
+    end
+    
+    attr_accessor :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate, :wf_comment, :id_noupdate
     
     attr_accessible :grinding_cost, :heat_treat_cost, :insp_cost, :last_updated_by_id, :machining_cost, :material_cost, :material_quoted, :material_unit_price, 
                     :material_wt, :mgmt_cost, :misc_cost, :note, :packing_cost, :plating_cost, :profit, :qty_quoted, :quote_task_id, :quoted_by_id, 
-                    :shipping_cost, :surface_finish_cost, :tax, :tooling_cost, :unit, :unit_price, :void, :wfid, :mfg_process_id, :rfq_id, :comment, :state,
+                    :shipping_cost, :surface_finish_cost, :tax, :tooling_cost, :unit, :unit_price, :void, :wfid, :mfg_process_id, :rfq_id, :wf_state,
                     :mfg_process_noupdate, :quote_task_noupdate,
                     :as => :role_new
     attr_accessible :grinding_cost, :heat_treat_cost, :insp_cost, :machining_cost, :material_cost, :material_quoted, :material_unit_price, 
                     :material_wt, :mgmt_cost, :misc_cost, :note, :packing_cost, :plating_cost, :profit, :qty_quoted, :quote_task_id, 
-                    :shipping_cost, :surface_finish_cost, :tax, :tooling_cost, :unit, :unit_price, :void, :wfid, :mfg_process_id, :comment, :state,
-                    :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate,
+                    :shipping_cost, :surface_finish_cost, :tax, :tooling_cost, :unit, :unit_price, :void, :wfid, :mfg_process_id, :wf_state,
+                    :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate, :id_noupdate, :wf_comment,
                     :as => :role_update
                     
     belongs_to :mfg_process, :class_name => JobshopQuotex.mfg_process_class.to_s
@@ -39,8 +62,22 @@ module JobshopQuotex
     validates :material_unit_price, :numericality => {:greater_than => 0, :if => 'material_unit_price.present?'}
     validates :material_cost, :numericality => {:greater_than => 0, :if => 'material_cost.present?'}
     validates :material_wt,  :numericality => {:greater_than => 0, :if => 'material_wt.present?'}
-    validates :profit, :numericality => {:greater_than => 0, :if => 'profit.present?'}
-        
+    validates :profit, :numericality => {:greater_than => 0, :if => 'profit.present?'}        
     validates :unit, :presence => true
+    
+    #for workflow input validation  
+    validate :validate_wf_input_data, :if => 'wf_state.present?' 
+    
+    def validate_wf_input_data
+      wf = Authentify::AuthentifyUtility.find_config_const('validation_quote_' + self.wf_state, 'jobshop_quotex')
+      if Authentify::AuthentifyUtility.find_config_const('wf_validate_in_config') == 'true' && wf.present? 
+        eval(wf) if wf.present?
+      #else
+        #validate code here
+        #case wf_state
+        #when 'submit'
+        #end
+      end
+    end
   end
 end

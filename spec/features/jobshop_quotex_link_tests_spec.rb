@@ -22,6 +22,28 @@ describe "LinkTests" do
          'mini-link'    => mini_btn +  'btn btn-link'
         }
     before(:each) do
+      wf = "def submit
+          wf_common_action('initial_state', 'reviewing', 'submit')
+        end   
+        def approve
+          wf_common_action('reviewing', 'approved', 'approve')
+        end    
+        def reject
+          wf_common_action('reviewing', 'rejected', 'reject')
+        end"
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_wf_action_def', :argument_value => wf)
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_wf_final_state_string', :argument_value => 'rejected, approved')
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_submit_inline', 
+                         :argument_value => "<%= f.input :tax, :label => t('Tax') %>")
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'validate_quote_submit', 
+                         :argument_value => "validates :tax, :presence => true
+                                             validates_numericality_of :tax, :greater_than_or_equal_to => 0
+                                           ")
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_route_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_validate_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_list_open_process_in_day', :argument_value => '45')
+      
       @pagination_config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'pagination', :argument_value => 30)
       z = FactoryGirl.create(:zone, :zone_name => 'hq')
       type = FactoryGirl.create(:group_type, :name => 'employee')
@@ -41,6 +63,13 @@ describe "LinkTests" do
         :sql_code => "record.quoted_by_id == session[:user_id]")
       user_access = FactoryGirl.create(:user_access, :action => 'create_jobshop_quote', :resource => 'commonx_logs', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
+      ua1 = FactoryGirl.create(:user_access, :action => 'list_open_process', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+      :sql_code => "JobshopQuotex::Quote.where(:void => false).order('created_at DESC')")
+      ua1 = FactoryGirl.create(:user_access, :action => 'event_action', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+      :sql_code => "")
+      ua1 = FactoryGirl.create(:user_access, :action => 'submit', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+      :sql_code => "")
+      
       
       @cust = FactoryGirl.create(:kustomerx_customer) 
       rfq = FactoryGirl.create(:jobshop_rfqx_rfq, :customer_id => @cust.id) 
@@ -72,6 +101,26 @@ describe "LinkTests" do
       save_and_open_page
       click_link 'New Log'
       page.should have_content('Log')
+      
+      visit quotes_path
+      #save_and_open_page
+      click_link 'Submit'
+      save_and_open_page
+      fill_in 'quote_wf_comment', :with => 'this line tests workflow'
+      fill_in 'quote_tax', :with => '10.00'
+      #save_and_open_page
+      click_button 'Save'
+      #
+      visit quotes_path
+      save_and_open_page
+      click_link 'Open Process'
+      page.should have_content('Quotes')
+      
+      visit quotes_path
+      click_link @quote.id.to_s
+      #save_and_open_page
+      page.should have_content('Quote Info')
+      page.should have_content('this line tests workflow')
     end
   end
 end

@@ -5,8 +5,7 @@ class CreateJobshopQuotexQuotes < ActiveRecord::Migration
       t.integer :quote_task_id
       t.integer :mfg_process_id
       t.string :wfid
-      t.text :comment
-      t.string :state
+      t.string :wf_state
       t.integer :last_updated_by_id
       t.integer :qty_quoted
       t.string :unit

@@ -10,6 +10,23 @@ module JobshopQuotex
     end
     
     before(:each) do
+      wf = "def submit
+          wf_common_action('initial_state', 'reviewing', 'submit')
+        end   
+        def approve
+          wf_common_action('reviewing', 'approved', 'approve')
+        end    
+        def reject
+          wf_common_action('reviewing', 'rejected', 'reject')
+        end"
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_wf_action_def', :argument_value => wf)
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_wf_final_state_string', :argument_value => 'rejected, approved')
+      
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_route_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_validate_in_config', :argument_value => 'true')
+      FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_list_open_process_in_day', :argument_value => '45')
+      
       z = FactoryGirl.create(:zone, :zone_name => 'hq')
       type = FactoryGirl.create(:group_type, :name => 'employee')
       ug = FactoryGirl.create(:sys_user_group, :user_group_name => 'ceo', :group_type_id => type.id, :zone_id => z.id)
@@ -94,6 +111,16 @@ module JobshopQuotex
         get 'edit', {:use_route => :jobshop_quotex, :id => q.id}
         response.should be_success
       end
+      
+      it "should redirect to previous page for an open process" do
+        user_access = FactoryGirl.create(:user_access, :action => 'update', :resource =>'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "")
+        session[:user_id] = @u.id
+        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
+        q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'reviewing')  
+        get 'edit', {:use_route => :jobshop_quotex, :id => q.id}
+        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
+      end
     end
   
     describe "GET 'update'" do
@@ -139,6 +166,22 @@ module JobshopQuotex
         q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :quoted_by_id => @u.id)
         get 'copy_last', {:use_route => :jobshop_quotex, :quote_task_id => @q_task.id}
         response.should be_success
+      end
+    end
+    
+    describe "GET 'list open process" do
+      it "return open process only" do
+        user_access = FactoryGirl.create(:user_access, :action => 'list_open_process', :resource =>'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "JobshopQuotex::Quote.where(:void => false).order('created_at DESC')")
+        
+        session[:user_id] = @u.id
+        session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
+        q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :created_at => 50.days.ago, :wf_state => 'initial_state')
+        q1 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'reviewing')
+        q2 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'initial_state')
+        q3 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'rejected', :wfid => 'rejected')  #wf_state can't be what was defined.
+        get 'list_open_process', {:use_route => :jobshop_quotex}
+        assigns(:quotes).should =~ [q1, q2]
       end
     end
   
