@@ -9,7 +9,7 @@ JobshopQuotex::Engine.routes.draw do
       get :copy_last
     end
     
-    #=begin
+#=begin
     workflow_routes = Authentify::AuthentifyUtility.find_config_const('quote_wf_route', 'jobshop_quotex')
     if Authentify::AuthentifyUtility.find_config_const('wf_route_in_config') == 'true' && workflow_routes.present?
       eval(workflow_routes) 
