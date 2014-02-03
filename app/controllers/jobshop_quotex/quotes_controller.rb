@@ -11,14 +11,14 @@ module JobshopQuotex
       @quotes = @quotes.where(:rfq_id => @rfq.id) if @rfq
       @quotes = @quotes.where(:quote_task_id => @quote_task.id) if @quote_task
       @quotes = @quotes.page(params[:page]).per_page(@max_pagination) 
-      @erb_code = find_config_const('quote_index_view', 'jobshop_quotex_quotes')
+      @erb_code = find_config_const('quote_index_view', 'jobshop_quotex')
     end
   
     def new
       @title = t('New Quote')
       @quote = JobshopQuotex::Quote.new()
       @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
-      @erb_code = find_config_const('quote_new_view', 'jobshop_quotex_quotes')
+      @erb_code = find_config_const('quote_new_view', 'jobshop_quotex')
     end
   
     def create
@@ -40,7 +40,7 @@ module JobshopQuotex
     def edit
       @title = t('Update Quote')
       @quote = JobshopQuotex::Quote.find_by_id(params[:id])
-      @erb_code = find_config_const('quote_edit_view', 'jobshop_quotex_quotes')
+      @erb_code = find_config_const('quote_edit_view', 'jobshop_quotex')
       if @quote.wf_state.present? && @quote.current_state != :initial_state
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=NO Update. Record Being Processed!")
       end
@@ -60,7 +60,7 @@ module JobshopQuotex
     def show
       @title = t('Quote Info')
       @quote = JobshopQuotex::Quote.find_by_id(params[:id])
-      @erb_code = find_config_const('quote_show_view', 'jobshop_quotex_quotes')
+      @erb_code = find_config_const('quote_show_view', 'jobshop_quotex')
     end
     
     def list_open_process  
@@ -72,7 +72,7 @@ module JobshopQuotex
       @title = t('New Quote')
       @quote = JobshopQuotex::Quote.find_by_id(JobshopQuotex::Quote.where(:quote_task_id => @quote_task.id, :void => false).last.id)
       @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
-      @erb_code = find_config_const('quote_copy_last_view', 'jobshop_quotex_quotes')
+      @erb_code = find_config_const('quote_copy_last_view', 'jobshop_quotex')
     end
     
     protected
