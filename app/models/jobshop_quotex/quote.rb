@@ -24,17 +24,18 @@ module JobshopQuotex
       end
     end
     
-    attr_accessor :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate, :wf_comment, :id_noupdate
+    attr_accessor :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate, :wf_comment, :id_noupdate, :rfq_prod_info
     
     attr_accessible :grinding_cost, :heat_treat_cost, :insp_cost, :last_updated_by_id, :machining_cost, :material_cost, :material_quoted, :material_unit_price, 
                     :material_wt, :mgmt_cost, :misc_cost, :note, :packing_cost, :plating_cost, :profit, :qty_quoted, :quote_task_id, :quoted_by_id, 
                     :shipping_cost, :surface_finish_cost, :tax, :tooling_cost, :unit, :unit_price, :void, :wfid, :mfg_process_id, :rfq_id, :wf_state,
-                    :mfg_process_noupdate, :quote_task_noupdate,
+                    :mfg_process_noupdate, :quote_task_noupdate, :rfq_prod_info,
                     :as => :role_new
     attr_accessible :grinding_cost, :heat_treat_cost, :insp_cost, :machining_cost, :material_cost, :material_quoted, :material_unit_price, 
                     :material_wt, :mgmt_cost, :misc_cost, :note, :packing_cost, :plating_cost, :profit, :qty_quoted, :quote_task_id, 
                     :shipping_cost, :surface_finish_cost, :tax, :tooling_cost, :unit, :unit_price, :void, :wfid, :mfg_process_id, :wf_state,
                     :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate, :id_noupdate, :wf_comment,
+                    :rfq_prod_info,
                     :as => :role_update
                     
     belongs_to :mfg_process, :class_name => JobshopQuotex.mfg_process_class.to_s

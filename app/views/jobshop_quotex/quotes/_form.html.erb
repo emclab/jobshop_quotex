@@ -1,10 +1,11 @@
 <% if @view_in_config && @erb_code %>
-  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  <%= render inline: @erb_code %>
   
 <% else %>
 <%= simple_form_for @quote do |f| %> 
          
-      <%= link_to JobshopQuotex.quote_task_class.find_by_id(@quote_task.id).name, SUBURI + "/authentify/view_handler?index=1&url=#{event_taskx.event_task_path(@quote_task)}"  %>
+      <%#= link_to JobshopQuotex.quote_task_class.find_by_id(@quote_task.id).name, SUBURI + "/authentify/view_handler?index=1&url=#{event_taskx.event_task_path(@quote_task)}"  %>
+      <%= f.input :rfq_prod_info, :label => t('Product Name/#'), :readonly => true, :input_html => {:value => @rfq.product_name + ' ' + @rfq.drawing_num} %>
       <%= f.input :mfg_process_noupdate, :label => t('Mfg Process'), :readonly => true, :input_html => {:value => JobshopQuotex.mfg_process_class.find_by_id(@quote.mfg_process_id).name} %>
       <%= f.input :material_quoted, :label => t('Material Quoted'), :readonly => readonly?(@quote, 'material_quoted') %>   
 	  <%= f.input :qty_quoted, :label => t('Qty Quoted'), :readonly => readonly?(@quote, 'qty_quoted') %> 
