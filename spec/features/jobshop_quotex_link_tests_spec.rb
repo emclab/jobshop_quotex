@@ -72,11 +72,11 @@ describe "LinkTests" do
       
       
       @cust = FactoryGirl.create(:kustomerx_customer) 
-      rfq = FactoryGirl.create(:jobshop_rfqx_rfq, :customer_id => @cust.id) 
-      @q_task = FactoryGirl.create(:event_taskx_event_task, :resource_id => rfq.id, :resource_string => JobshopQuotex.rfq_class.to_s.underscore.pluralize)
+      @rfq = FactoryGirl.create(:jobshop_rfqx_rfq, :customer_id => @cust.id) 
+      @q_task = FactoryGirl.create(:event_taskx_event_task, :resource_id => @rfq.id, :resource_string => JobshopQuotex.rfq_class.to_s.underscore.pluralize)
       #@q_task1 = FactoryGirl.create(:event_taskx_event_task, :name => 'quote && quote')
       mfg_process = FactoryGirl.create(:mfg_processx_mfg_process) 
-      @quote = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :mfg_process_id => mfg_process.id, :rfq_id => rfq.id) 
+      @quote = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :mfg_process_id => mfg_process.id, :rfq_id => @rfq.id) 
       log = FactoryGirl.create(:commonx_log, :resource_id => @quote.id, :resource_name => 'jobshop_quotex_quotes')
           
       visit '/'
@@ -105,7 +105,7 @@ describe "LinkTests" do
       visit quotes_path
       #save_and_open_page
       click_link 'Submit'
-      save_and_open_page
+      #save_and_open_page
       fill_in 'quote_wf_comment', :with => 'this line tests workflow'
       fill_in 'quote_tax', :with => '10.00'
       #save_and_open_page
@@ -121,6 +121,25 @@ describe "LinkTests" do
       #save_and_open_page
       page.should have_content('Quote Info')
       page.should have_content('this line tests workflow')
+      
+      #new quote. 
+      config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'piece_unit', :argument_value => 'piece')
+      mfg = FactoryGirl.create(:mfg_processx_mfg_process, :name => 'new nane', :rfq_id => @rfq.id)
+      visit new_quote_path(:quote_task_id => @q_task.id, :rfq_id => @rfq.id)
+      save_and_open_page
+      #fill_in 'quote_mfg_process_id', :with => mfg.name
+      select(mfg.name, :from => 'quote_mfg_process_id')
+      fill_in 'quote_material_quoted', :with => 'steel'
+      fill_in 'quote_qty_quoted', :with => 10000
+      #fill_in 'quote_unit', :with => 'piece'
+      select('piece', :from => 'quote_unit')
+      fill_in 'quote_material_wt', with: 20
+      fill_in 'quote_material_unit_price', with: 10
+      fill_in 'quote_machining_cost', with: 10
+      fill_in 'quote_unit_price', with: 23
+      
+      #click_button 'Save'  #need to set unit_price to not readonly on new view. Otherwise need to make js working on the page.
+      #save_and_open_page
     end
   end
 end
