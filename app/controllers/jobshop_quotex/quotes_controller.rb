@@ -25,7 +25,6 @@ module JobshopQuotex
       @quote = JobshopQuotex::Quote.new(params[:quote], :as => :role_new)
       @quote.last_updated_by_id = session[:user_id]
       @quote.quoted_by_id = session[:user_id]
-      @quote.quote_task_id = @quote_task.id
       if @quote.save
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
       else
