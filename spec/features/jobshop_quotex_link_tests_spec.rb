@@ -61,6 +61,8 @@ describe "LinkTests" do
            :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'show', :resource =>'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "record.quoted_by_id == session[:user_id]")
+      ua1 = FactoryGirl.create(:user_access, :action => 'create', :resource => 'mfg_orderx_orders', :role_definition_id => @role.id, :rank => 1,
+           :sql_code => "")
       user_access = FactoryGirl.create(:user_access, :action => 'create_jobshop_quote', :resource => 'commonx_logs', :role_definition_id => @role.id, :rank => 1,
         :sql_code => "")
       ua1 = FactoryGirl.create(:user_access, :action => 'list_open_process', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
@@ -121,6 +123,9 @@ describe "LinkTests" do
       #save_and_open_page
       page.should have_content('Quote Info')
       page.should have_content('this line tests workflow')
+      click_link 'New Order'
+      save_and_open_page
+      page.should have_content('New Order')
       
       #new quote. 
       config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'piece_unit', :argument_value => 'piece')
