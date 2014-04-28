@@ -4,7 +4,14 @@
 <% else %>
 <div id="main_body">
 <h4><%=t('Quote Info') %></h4>
-
+<p>
+  <b><%= t('Product Name') %></b>
+  <%= @rfq.product_name %>
+</p>
+<p>
+  <b><%= t('Quoted Drawing#') %></b>
+  <%= @quote.drawing_num %>
+</p>
 <p>
   <b><%= t('Quote Task') %></b>
   <%= JobshopQuotex.quote_task_class.find_by_id(@quote.quote_task_id).name %>
@@ -87,7 +94,7 @@
 </p>
 <p>
   <b><%= t('WF State') %>:</b>
-  <%= t(@quote.wf_state) if @quote.wf_state.present? %>
+  <%= t(@quote.wf_state.humanize.titleize) if @quote.wf_state.present? %>
 </p>
 <p>
   <b><%= t('Quoted By') %></b>

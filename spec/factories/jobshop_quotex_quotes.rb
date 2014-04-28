@@ -4,13 +4,13 @@ FactoryGirl.define do
   factory :jobshop_quotex_quote, :class => 'JobshopQuotex::Quote' do
     rfq_id 1
     quote_task_id 1
-    wfid "MyString"
+    drawing_num "drawing #"
     wf_state 'initial_state'
     last_updated_by_id 1
     qty_quoted 1
-    unit "MyString"
+    unit "unit"
     material_wt "9.99"
-    material_quoted "MyString"
+    material_quoted "My masterial"
     material_unit_price "9.99"
     unit_price "9.99"
     material_cost "9.99"
@@ -30,7 +30,7 @@ FactoryGirl.define do
     mfg_process_id 1
     quoted_by_id 1
     void false
-    note "MyText"
+    note "My note Text"
     
   end
 end

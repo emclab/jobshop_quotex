@@ -30,15 +30,33 @@ describe "LinkTests" do
         end    
         def reject
           wf_common_action('reviewing', 'rejected', 'reject')
-        end"
+        end
+        def rewind
+          wf_common_action('reviewing', 'initial_state', 'rewind')
+        end
+        def send_quote  
+          wf_common_action('approved', 'sent', 'send_quote')
+        end
+        "
+        #(from, to, event) send is a rails/ruby keywoard and can NOT be used here as event.
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_wf_action_def', :argument_value => wf)
-      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_wf_final_state_string', :argument_value => 'rejected, approved')
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_wf_final_state_string', 
+       :argument_value => 'rejected, sent')
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_submit_inline', 
                          :argument_value => "<%= f.input :tax, :label => t('Tax') %>")
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'validate_quote_submit', 
                          :argument_value => "validates :tax, :presence => true
-                                             validates_numericality_of :tax, :greater_than_or_equal_to => 0
-                                           ")
+                                             validates_numericality_of :tax, :greater_than_or_equal_to => 0 ")
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_approve_inline', 
+                         :argument_value => "<%= f.input :approved, :as => :hidden, :input_html => {:value => true} %>,
+                                             <%= f.input :approved_date, :label => t('Approve Date') %>")
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'validate_quote_approve', 
+                         :argument_value => "validates :approved, :approved_date, :presence => true ")  
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_send_quote_inline', 
+                         :argument_value => "<%= f.input :sent_to_customer, :as => :hidden, :input_html => {:value => true} %>,
+                                             <%= f.input :sent_to_customer_date, :label => t('Send Quote Date') %>")
+      FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'validate_quote_send_quote', 
+                         :argument_value => "validates :sent_to_customer, :sent_to_customer_date, :presence => true ")                                    
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_route_in_config', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_validate_in_config', :argument_value => 'true')
@@ -71,7 +89,12 @@ describe "LinkTests" do
       :sql_code => "")
       ua1 = FactoryGirl.create(:user_access, :action => 'submit', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
       :sql_code => "")
-      
+      ua1 = FactoryGirl.create(:user_access, :action => 'approve', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+      :sql_code => "")
+      ua1 = FactoryGirl.create(:user_access, :action => 'reject', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+      :sql_code => "")
+      ua1 = FactoryGirl.create(:user_access, :action => 'rewind', :resource => 'jobshop_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+      :sql_code => "")
       
       @cust = FactoryGirl.create(:kustomerx_customer) 
       @rfq = FactoryGirl.create(:jobshop_rfqx_rfq, :customer_id => @cust.id) 
@@ -84,7 +107,7 @@ describe "LinkTests" do
       visit '/'
       #save_and_open_page
       fill_in "login", :with => @u.login
-      fill_in "password", :with => 'password'
+      fill_in "password", :with => @u.password
       click_button 'Login'
     end
     
@@ -96,14 +119,60 @@ describe "LinkTests" do
       page.should have_content('Quotes')
       click_link 'Edit'
       page.should have_content('Update Quote')
+      fill_in 'quote_drawing_num', :with => 'a new number'
+      click_button 'Save'
+      save_and_open_page
+      #bad edit data
+      visit quotes_path
+      click_link 'Edit'
+      fill_in 'quote_qty_quoted', :with => ''
+      click_button 'Save'
+      save_and_open_page
+      
       visit quotes_path
       click_link @quote.id.to_s
       #save_and_open_page
       page.should have_content('Quote Info')
       save_and_open_page
-      click_link 'New Log'
-      page.should have_content('Log')
+      #click_link 'New Log'
+      #page.should have_content('Log')
+     
       
+      #new quote. 
+      config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'piece_unit', :argument_value => 'piece')
+      mfg = FactoryGirl.create(:mfg_processx_mfg_process, :name => 'new nane', :rfq_id => @rfq.id)
+      visit new_quote_path(:quote_task_id => @q_task.id, :rfq_id => @rfq.id)
+      save_and_open_page
+      #fill_in 'quote_mfg_process_id', :with => mfg.name
+      select(mfg.name, :from => 'quote_mfg_process_id')
+      fill_in 'quote_material_quoted', :with => 'steel'
+      fill_in 'quote_qty_quoted', :with => 10000
+      fill_in 'quote_drawing_num', :with => 'piece123'
+      select('piece', :from => 'quote_unit')
+      fill_in 'quote_material_wt', with: 20
+      fill_in 'quote_material_unit_price', with: 10
+      fill_in 'quote_machining_cost', with: 10
+      fill_in 'quote_unit_price', with: 23
+      
+      click_button 'Save'  #need to set unit_price to not readonly on new view. Otherwise need to make js working on the page.
+      save_and_open_page
+      #bad data
+      visit new_quote_path(:quote_task_id => @q_task.id, :rfq_id => @rfq.id)
+      select(mfg.name, :from => 'quote_mfg_process_id')
+      fill_in 'quote_material_quoted', :with => ''
+      fill_in 'quote_qty_quoted', :with => 10000
+      fill_in 'quote_drawing_num', :with => 'piece123'
+      select('piece', :from => 'quote_unit')
+      fill_in 'quote_material_wt', with: 20
+      fill_in 'quote_material_unit_price', with: 10
+      fill_in 'quote_machining_cost', with: 10
+      fill_in 'quote_unit_price', with: 23     
+      click_button 'Save'  #need to set unit_price to not readonly on new view. Otherwise need to make js working on the page.
+      save_and_open_page
+    end
+    
+    it "should handle workflow" do
+      #workflow submit
       visit quotes_path
       #save_and_open_page
       click_link 'Submit'
@@ -124,27 +193,23 @@ describe "LinkTests" do
       page.should have_content('Quote Info')
       page.should have_content('this line tests workflow')
       click_link 'New Order'
-      save_and_open_page
+      #save_and_open_page
       page.should have_content('New Order')
       
-      #new quote. 
-      config = FactoryGirl.create(:engine_config, :engine_name => nil, :engine_version => nil, :argument_name => 'piece_unit', :argument_value => 'piece')
-      mfg = FactoryGirl.create(:mfg_processx_mfg_process, :name => 'new nane', :rfq_id => @rfq.id)
-      visit new_quote_path(:quote_task_id => @q_task.id, :rfq_id => @rfq.id)
+      #let's rewind it back
+      visit quotes_path
       save_and_open_page
-      #fill_in 'quote_mfg_process_id', :with => mfg.name
-      select(mfg.name, :from => 'quote_mfg_process_id')
-      fill_in 'quote_material_quoted', :with => 'steel'
-      fill_in 'quote_qty_quoted', :with => 10000
-      #fill_in 'quote_unit', :with => 'piece'
-      select('piece', :from => 'quote_unit')
-      fill_in 'quote_material_wt', with: 20
-      fill_in 'quote_material_unit_price', with: 10
-      fill_in 'quote_machining_cost', with: 10
-      fill_in 'quote_unit_price', with: 23
+      click_link 'Rewind'
+      fill_in 'quote_wf_comment', :with => 'this quote sucks'
+      click_button 'Save'
+      #check the message
+      visit quotes_path
+      click_link @quote.id.to_s
+      save_and_open_page
+      page.should have_content('Quote Info')
+      page.should have_content('this quote sucks')
+      page.should have_content('Initial State')
       
-      #click_button 'Save'  #need to set unit_price to not readonly on new view. Otherwise need to make js working on the page.
-      #save_and_open_page
     end
   end
 end

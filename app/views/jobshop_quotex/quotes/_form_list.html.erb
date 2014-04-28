@@ -6,8 +6,8 @@
     <table class="table table-striped">
 		<tr>
 			<th><%= t('Q#')%></th>
-			<th><%= t('Product/Drawing') %></th>
-			<th><%= t('Quote Task') %></th>
+			<th><%= t('Product Name') %></th>
+			<th><%= t('Quoted Drawing#') %></th>
 			<th><%= t('Quote Date') %></th>
 			<th><%= t('Qty') %></th>
 			<th><%= t('Product Unit Price') %></th>	
@@ -16,9 +16,12 @@
 			<th><%= t('Machining Cost') %></th>
 			<th><%= t('Material Quoted') %></th>
 			<th><%= t('Tooling Cost') %></th>
+			<th><%= t('Approved Date') %></th>
 			<th><%= t('WF State') %></th>
 			<th><%= t('Quoted By') %></th>
 			<th><%= t('Last Updated By') %></th>
+			<th></th>
+			<th></th>
 			<th></th>
 			<th></th>
 		</tr>
@@ -29,23 +32,25 @@
 		  	<% else %>
 		  	  <td><%= r.id %></td>
 		  	<% end %>
-		  	<td><%= JobshopQuotex.rfq_class.find_by_id(r.rfq_id).product_name + ' ' + JobshopQuotex.rfq_class.find_by_id(r.rfq_id).drawing_num %></td>
-		  	<td><%= JobshopQuotex.quote_task_class.find_by_id(r.quote_task_id).name %></td>
+		  	<td><%= JobshopQuotex.rfq_class.find_by_id(r.rfq_id).product_name %></td>
+		  	<td><%= prt(r, :drawing_num) %></td>
 		  	<td><%= r.created_at.strftime("%Y/%m/%d") %></td>
 		  	<td><%= prt(r, :qty_quoted) %><%= prt(r, :unit) %></td>
 			<td><%= prt(r, :unit_price) %></td>
 			<td><%= prt(r, :material_wt) %></td>
 			<td><%= prt(r, :material_unit_price) %></td>
-			<td><%= prt(r, :machining_cost) %></td>
-			<td><%= prt(r, :material_quoted) %></td>
+			<td><%= r.approved_date.strftime("%Y/%m/%d") if r.approved_date.present? %></td>
+		  	<td><%= prt(r, :material_quoted) %></td>
 			<td><%= prt(r, :tooling_cost) %></td>
-			<td><%= t(prt(r, :wf_state).humanize) if r.wf_state.present? %></td>
+			<td><%= t(prt(r, :wf_state).humanize.titleize) if r.wf_state.present? %></td>
 			<td><%= prt(r, 'quoted_by.name') %></td> 
 			<td><%= prt(r, 'last_updated_by.name') %></td>    
-			<td><%= link_to t('Edit'), SUBURI + "/authentify/view_handler?index=1&url=#{edit_quote_path(r)}", :class => BUTTONS_CLS['action']  if (r.wf_state.nil? or r.wf_state == 'initial_state') && has_action_right?('update', params[:controller], r) %></td>
-			<td><%= link_to t('Submit'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'submit', :resource_id => r.id, :resource_string => params[:controller])}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'initial_state' && has_action_right?('submit', params[:controller], r) %></td>
-			<td><%= link_to t('Approve'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'approve', :resource_id => r.id, :resource_string => params[:controller])}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'being_reviewed' && has_action_right?('review', params[:controller], r) %></td>
-			<td><%= link_to t('Reject'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'reject', :resource_id => r.id, :resource_string => params[:controller])}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'being_reviewed' && has_action_right?('review', params[:controller], r) %></td>		  
+			<td><%= link_to t('Submit ') + t('Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'submit', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'initial_state' && has_action_right?('submit', params[:controller], r) %></td>
+			<td><%= link_to t('Approve ') + t('Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'approve', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'reviewing' && has_action_right?('approve', params[:controller], r) %></td>
+			<td><%= link_to t('Reject ') + t('Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'reject', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'reviewing' && has_action_right?('reject', params[:controller], r) %></td>		  
+	        <td><%= link_to t('Rewind ') + t('Quote'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'rewind', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'reviewing' && has_action_right?('rewind', params[:controller], r) %></td>		  
+	        <td><%= link_to t('Send to Customer'), SUBURI + "/authentify/view_handler?index=1&url=#{CGI.escape event_action_quote_path(r, :wf_event => 'send_quote', :resource_id => r.id)}", :class => BUTTONS_CLS['action']  if r.wf_state.present? && r.wf_state == 'approved' && has_action_right?('send_quote', params[:controller], r) %></td>	
+	        <td><%= link_to t('Edit'), SUBURI + "/authentify/view_handler?index=1&url=#{edit_quote_path(r)}", :class => BUTTONS_CLS['action']  if (r.wf_state.nil? or r.wf_state == 'initial_state') && has_action_right?('update', params[:controller], r) %></td>	  
 		  </tr>
 		<% end %>
 	</table>

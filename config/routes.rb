@@ -16,9 +16,11 @@ JobshopQuotex::Engine.routes.draw do
     elsif Rails.env.test?  #for rsepc. routes loaded before FactoryGirl.
       member do
         get :event_action
-        put :accept
-        put :reject
         put :submit
+        put :approve
+        put :reject
+        put :rewind
+        put :send_quote
       end
       
       collection do

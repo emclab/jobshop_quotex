@@ -1,6 +1,20 @@
 // Place all the behaviors and hooks related to the matching controller here.
 // All this logic will automatically be available in application.js.
+$(function() {
+   $("#quote_quote_date").datepicker({dateFormat: 'yy-mm-dd'});
+   $("#quote_approved_date").datepicker({dateFormat: 'yy-mm-dd'});
+   $("#quote_sent_to_customer_date").datepicker({dateFormat: 'yy-mm-dd'});
+   
+});
 
+//for search.html.erb
+$(function() {
+   $("#quote_start_date_s").datepicker({dateFormat: 'yy-mm-dd'});
+   $("#quote_end_date_s").datepicker({dateFormat: 'yy-mm-dd'});
+   $("#quote_quote_date_s").datepicker({dateFormat: 'yy-mm-dd'});
+   $("#quote_approved_date_s").datepicker({dateFormat: 'yy-mm-dd'});
+   $("#quote_sent_to_customer_date_s").datepicker({dateFormat: 'yy-mm-dd'});
+});
 //material cost
 $(function (){
 	$('#quote_material_wt').change(function(){

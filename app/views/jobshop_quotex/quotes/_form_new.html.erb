@@ -4,7 +4,8 @@
 <% else %>
 <%= simple_form_for @quote do |f| %>    
       <%#= link_to JobshopQuotex.quote_task_class.find_by_id(@quote_task.id).name, SUBURI + "/authentify/view_handler?index=1&url=#{event_taskx.event_task_path(@quote_task)}"  %>
-      <%= f.input :rfq_prod_info, :label => t('Product Name/#'), :readonly => true, :input_html => {:value => @rfq.product_name + ' ' + @rfq.drawing_num} %>
+      <%= f.input :rfq_prod_info, :label => t('Product Name'), :readonly => true, :input_html => {:value => @rfq.product_name + ' ' + @rfq.drawing_num} %>
+      <%= f.input :drawing_num, :label => t('Quoted Drawing#') %>
       <%= f.input :rfq_id, :as => :hidden, :input_html => {:value => @rfq.id} %>
       <%= f.input :quote_task_id, :as => :hidden, :input_html => {:value => @quote_task.id} %>
       <%= f.input :mfg_process_id, :label => t('Mfg Process'), :collection => JobshopQuotex.mfg_process_class.where(:rfq_id => @rfq.id, :void => false), :label_method => :name, :value_method => :id, :include_blank => true %>
@@ -27,7 +28,7 @@
 	  <%= f.input :misc_cost, :label => t('Misc Cost'), :palceholder => 'x.xxxx or nothing' %>
 	  <%= f.input :tax, :label => t('Tax'), :palceholder => 'x.xxxx or nothing' %>
 	  <%= f.input :profit, :label => t('Profit'), :palceholder => 'x.xxxx or nothing' %>
-	  <%= f.input :tooling_cost, :label => t('Tooling Cost'), :palceholder => 'x or nothing' %>
+	  <%= f.input :tooling_cost, :label => t('Tooling Cost'), :palceholder => 'xxx or nothing' %>
 	  <%= f.input :note, :label => t('Note'), :input_html => {:rows => 4} %>
 	  
 	  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>

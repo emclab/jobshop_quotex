@@ -179,7 +179,7 @@ module JobshopQuotex
         q = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task.id, :created_at => 50.days.ago, :wf_state => 'initial_state')
         q1 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'reviewing')
         q2 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'initial_state')
-        q3 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'rejected', :wfid => 'rejected')  #wf_state can't be what was defined.
+        q3 = FactoryGirl.create(:jobshop_quotex_quote, :quote_task_id => @q_task1.id, :wf_state => 'rejected')  #wf_state can't be what was defined.
         get 'list_open_process', {:use_route => :jobshop_quotex}
         assigns(:quotes).should =~ [q1, q2]
       end
