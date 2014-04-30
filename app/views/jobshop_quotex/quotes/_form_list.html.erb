@@ -28,7 +28,7 @@
 		<% models.each do |r| %>
 		  <tr>
 		  	<% if has_action_right?('show', params[:controller], r) %>
-		  	  <td><%=link_to r.id.to_s, SUBURI + "/authentify/view_handler?index=1&url=#{quote_path(r)}", :class => BUTTONS_CLS['action']  %></td>
+		  	  <td><%=link_to r.id.to_s, SUBURI + "/authentify/view_handler?index=1&url=#{quote_path(r)}" %></td>
 		  	<% else %>
 		  	  <td><%= r.id %></td>
 		  	<% end %>
