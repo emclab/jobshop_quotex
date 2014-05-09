@@ -45,18 +45,17 @@ describe "LinkTests" do
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_submit_inline', 
                          :argument_value => "<%= f.input :tax, :label => t('Tax') %>")
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'validate_quote_submit', 
-                         :argument_value => "validates :tax, :presence => true
-                                             validates_numericality_of :tax, :greater_than_or_equal_to => 0 ")
+                         :argument_value => "errors.add(:tax, I18n.t('Must be numeric')) if !(tax.is_a? Numeric) or (tax.present? && (tax.is_a? Numeric) && tax <= 0)")
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_approve_inline', 
                          :argument_value => "<%= f.input :approved, :as => :hidden, :input_html => {:value => true} %>,
-                                             <%= f.input :approved_date, :label => t('Approve Date') %>")
+                                             <%= f.input :approved_date, :label => t('Approve Date'), :as => :string %>")
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'validate_quote_approve', 
-                         :argument_value => "validates :approved, :approved_date, :presence => true ")  
+                         :argument_value => "errors.add(:approved_date, I18n.t('No empty'))if approved_date.blank? ")  
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'quote_send_quote_inline', 
                          :argument_value => "<%= f.input :sent_to_customer, :as => :hidden, :input_html => {:value => true} %>,
-                                             <%= f.input :sent_to_customer_date, :label => t('Send Quote Date') %>")
+                                             <%= f.input :sent_to_customer_date, :label => t('Send Quote Date'), :as => :string %>")
       FactoryGirl.create(:engine_config, :engine_name => 'jobshop_quotex', :engine_version => nil, :argument_name => 'validate_quote_send_quote', 
-                         :argument_value => "validates :sent_to_customer, :sent_to_customer_date, :presence => true ")                                    
+                         :argument_value => "errors.add(:sent_to_customer_date, I18n.t('No empty'))if sent_to_customer_date.blank? ")                                    
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_pdef_in_config', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_route_in_config', :argument_value => 'true')
       FactoryGirl.create(:engine_config, :engine_name => '', :engine_version => nil, :argument_name => 'wf_validate_in_config', :argument_value => 'true')
@@ -196,16 +195,27 @@ describe "LinkTests" do
       #save_and_open_page
       page.should have_content('New Order')
       
+      #bad data
+      visit quotes_path
+      #save_and_open_page
+      click_link 'Approve'
+      save_and_open_page
+      fill_in 'quote_wf_comment', :with => 'this quote is approved'
+      fill_in 'quote_approved_date', :with => nil
+      click_button 'Save'
+      visit quotes_path
+      click_link @quote.id.to_s
+      page.should_not have_content('this quote is approved')
       #let's rewind it back
       visit quotes_path
-      save_and_open_page
+      #save_and_open_page
       click_link 'Rewind'
       fill_in 'quote_wf_comment', :with => 'this quote sucks'
       click_button 'Save'
       #check the message
       visit quotes_path
       click_link @quote.id.to_s
-      save_and_open_page
+      #save_and_open_page
       page.should have_content('Quote Info')
       page.should have_content('this quote sucks')
       page.should have_content('Initial State')

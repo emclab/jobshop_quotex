@@ -31,6 +31,7 @@ module JobshopQuotex
         @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
         @rfq = JobshopQuotex.rfq_class.find_by_id(params[:quote][:rfq_id]) if params[:quote].present? && params[:quote][:rfq_id].present?
         @quote_task = JobshopQuotex.quote_task_class.find_by_id(params[:quote][:quote_task_id]) if params[:quote].present? && params[:quote][:quote_task_id].present?
+        @erb_code = find_config_const('quote_new_view', 'jobshop_quotex')
         flash[:notice] = t('Data Error. Not Saved!')
         render 'new'
       end
@@ -51,6 +52,7 @@ module JobshopQuotex
       if @quote.update_attributes(params[:quote], :as => :role_update)
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       else
+        @erb_code = find_config_const('quote_edit_view', 'jobshop_quotex')
         flash[:notice] = t('Data Error. Not Updated!')
         render 'edit'
       end

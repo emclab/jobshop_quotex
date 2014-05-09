@@ -28,7 +28,8 @@ module JobshopQuotex
       end
     end
     
-    attr_accessor :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate, :wf_comment, :id_noupdate, :rfq_prod_info
+    attr_accessor :void_noupdate, :quoted_by_noupdate, :last_updated_by_noupdate, :mfg_process_noupdate, :quote_task_noupdate, :wf_comment, :id_noupdate, 
+                  :rfq_prod_info, :wf_event, :wf_state_noupdate
     
     attr_accessible :grinding_cost, :heat_treat_cost, :insp_cost, :last_updated_by_id, :machining_cost, :material_cost, :material_quoted, :material_unit_price, 
                     :material_wt, :mgmt_cost, :misc_cost, :note, :packing_cost, :plating_cost, :profit, :qty_quoted, :quote_task_id, :quoted_by_id, :quote_date,
@@ -83,7 +84,7 @@ module JobshopQuotex
     validate :validate_wf_input_data, :if => 'wf_state.present?' 
     
     def validate_wf_input_data
-      wf = Authentify::AuthentifyUtility.find_config_const('validation_quote_' + self.wf_state, 'jobshop_quotex')
+      wf = Authentify::AuthentifyUtility.find_config_const('validate_quote_' + self.wf_event, 'jobshop_quotex') if self.wf_event.present?
       if Authentify::AuthentifyUtility.find_config_const('wf_validate_in_config') == 'true' && wf.present? 
         eval(wf)
       end
