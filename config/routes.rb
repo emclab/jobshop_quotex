@@ -3,9 +3,9 @@ JobshopQuotex::Engine.routes.draw do
   resources :quotes do
     collection do
       get :search
-      put :search_results
+      get :search_results
       get :stats
-      put :stats_results
+      get :stats_results
       get :copy_last
     end
     
